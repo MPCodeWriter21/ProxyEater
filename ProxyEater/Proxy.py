@@ -32,16 +32,6 @@ class ProxyType(Enum):
     SOCKS4 = 2
     SOCKS5 = 3
 
-    def __init__(self, type_: _Union[int, str]):
-        super(ProxyType, self).__init__()
-        if isinstance(type_, int):
-            if type_ in [0, 1, 2, 3]:
-                self.value = type_
-            else:
-                raise ValueError(f'Invalid proxy type({type_}).')
-        elif isinstance(type_, str):
-            self.value = ProxyType.from_name(type_).value
-
     @staticmethod
     def from_name(name: str) -> 'ProxyType':
         """
