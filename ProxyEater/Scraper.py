@@ -17,8 +17,7 @@ class Scraper:
     is_succeed: bool = False
 
     def __init__(self, url: str, parser: dict, method: str = 'GET', name: str = None, useragent: str = None,
-                 proxy: Proxy = None,
-                 request_timeout: int = 10) -> None:
+                 proxy: Proxy = None, request_timeout: int = 10) -> None:
         self.session: requests.Session = requests.Session()
         if useragent:
             self.session.headers.update({'User-Agent': useragent})
@@ -47,7 +46,8 @@ class Scraper:
         return self.session.request(
             method=self.method,
             url=self.url,
-            timeout=self.request_timeout
+            timeout=self.request_timeout,
+            proxies=({'http': str(self.proxy), 'https': str(self.proxy)}) if self.proxy else None
         )
 
     def get_proxies(self, on_progress_callback: _Callable = None, on_success_callback: _Callable = None,

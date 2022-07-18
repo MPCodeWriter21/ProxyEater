@@ -155,13 +155,12 @@ def main():
                 def error_callback(scraper_: Scraper, error: Exception):
                     logger.error(f'{scraper_.name}: {error.__class__.__name__}: {error}')
 
-                def checking_callback(proxy_list: Scraper, progress: float):
+                def checking_callback(proxy_list: ProxyList, progress: float):
                     logger.progress_bar(progress, 100)
 
             logger.info(f'Scraping {config.get("id")}...')
             scraper = Scraper(config.get('url'), config.get('parser'), method=config.get('method'),
-                              name=config.get('id'),
-                              useragent=useragent, proxy=proxy, request_timeout=timeout)
+                              name=config.get('id'), useragent=useragent, proxy=proxy, request_timeout=timeout)
             proxies_ = scraper.get_proxies(on_progress_callback=progress_callback, on_success_callback=finish_callback,
                                            on_failure_callback=error_callback)
 
