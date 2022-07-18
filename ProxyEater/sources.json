@@ -1,0 +1,248 @@
+[
+    {
+        "id": "free-proxy-list.net",
+        "url": "https://free-proxy-list.net",
+        "method": "GET",
+        "parser": {
+            "pandas": {
+                "table_index": 0,
+                "ip": "IP Address",
+                "port": "Port",
+                "combined": null,
+                "type": {
+                    "default": "HTTP",
+                    "is_https_header": "Https",
+                    "is_https_value": "yes"
+                }
+            }
+        }
+    },
+    {
+        "id": "us-proxy.org",
+        "url": "https://www.us-proxy.org",
+        "method": "GET",
+        "parser": {
+            "pandas": {
+                "table_index": 0,
+                "ip": "IP Address",
+                "port": "Port",
+                "combined": null,
+                "type": {
+                    "default": "HTTP",
+                    "is_https_header": "Https",
+                    "is_https_value": "yes"
+                }
+            }
+        }
+    },
+    {
+        "id": "proxydb.net",
+        "url": "http://proxydb.net",
+        "method": "GET",
+        "parser": {
+            "pandas": {
+                "table_index": 0,
+                "ip": null,
+                "port": null,
+                "combined": "Proxy",
+                "type": {
+                    "protocols": {
+                        "header": "Protocol",
+                        "http": "HTTP",
+                        "https": "HTTPS",
+                        "socks4": "SOCKS4",
+                        "socks5": "SOCKS5"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "id": "free-proxy-list.com",
+        "url": "https://free-proxy-list.com/?search=1&port=&speed%5B%5D=2&speed%5B%5D=3&connect_time%5B%5D=2&connect_time%5B%5D=3&up_time=0&page={page}",
+        "method": "GET",
+        "parser": {
+            "pandas": {
+                "table_index": 1,
+                "ip": "IP Address",
+                "port": "Port",
+                "combined": null,
+                "type": {
+                    "protocols": {
+                        "header": "Type",
+                        "http": "http",
+                        "https": "https",
+                        "socks4": "https",
+                        "socks5": "socks4/5"
+                    }
+                },
+                "pages": {
+                    "method": "GET",
+                    "format_name": "page",
+                    "end": "no-proxy"
+                }
+            }
+        }
+    },
+    {
+        "id": "proxy-list.download-http",
+        "url": "https://www.proxy-list.download/api/v2/get?l=en&t=http",
+        "method": "GET",
+        "parser": {
+            "json": {
+                "data": "LISTA",
+                "ip": "IP",
+                "port": "PORT",
+                "type": {
+                    "default": "HTTP"
+                }
+            }
+        }
+    },
+    {
+        "id": "proxy-list.download-https",
+        "url": "https://www.proxy-list.download/api/v2/get?l=en&t=https",
+        "method": "GET",
+        "parser": {
+            "json": {
+                "data": "LISTA",
+                "ip": "IP",
+                "port": "PORT",
+                "type": {
+                    "default": "HTTPS"
+                }
+            }
+        }
+    },
+    {
+        "id": "proxy-list.download-socks4",
+        "url": "https://www.proxy-list.download/api/v2/get?l=en&t=socks4",
+        "method": "GET",
+        "parser": {
+            "json": {
+                "data": "LISTA",
+                "ip": "IP",
+                "port": "PORT",
+                "type": {
+                    "default": "SOCKS4"
+                }
+            }
+        }
+    },
+    {
+        "id": "proxy-list.download-socks5",
+        "url": "https://www.proxy-list.download/api/v2/get?l=en&t=socks5",
+        "method": "GET",
+        "parser": {
+            "json": {
+                "data": "LISTA",
+                "ip": "IP",
+                "port": "PORT",
+                "type": {
+                    "default": "SOCKS5"
+                }
+            }
+        }
+    },
+    {
+        "id": "vpnoverview.com",
+        "url": "https://vpnoverview.com/privacy/anonymous-browsing/free-proxy-servers",
+        "method": "GET",
+        "parser": {
+            "pandas": {
+                "table_index": 0,
+                "ip": "IP address",
+                "port": "Port",
+                "combined": null,
+                "type": {
+                    "protocols": {
+                        "header": "Type",
+                        "http": "HTTP, HTTPS",
+                        "https": "HTTPS",
+                        "socks4": "SOCKS4, SOCKS5",
+                        "socks5": "SOCKS5"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "id": "proxyscan.io",
+        "url": "https://www.proxyscan.io",
+        "method": "GET",
+        "parser": {
+            "pandas": {
+                "table_index": 0,
+                "ip": "Ip Address",
+                "port": "Port",
+                "combined": null,
+                "type": {
+                    "default": "HTTP"
+                }
+            }
+        }
+    },
+    {
+        "id": "proxylist.geonode.com",
+        "url": "https://proxylist.geonode.com/api/proxy-list?limit=300&page=1&sort_by=lastChecked&sort_type=desc&protocols=http,https",
+        "method": "GET",
+        "parser": {
+            "json": {
+                "data": "data",
+                "ip": "ip",
+                "port": "port",
+                "type": {
+                    "default": "HTTP"
+                }
+            }
+        }
+    },
+    {
+        "id": "proxyscrape.com",
+        "url": "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=10000&country=all&ssl=all&anonymity=all",
+        "method": "GET",
+        "parser": {
+            "text": {
+                "type": {
+                    "default": "HTTP"
+                }
+            }
+        }
+    },
+    {
+        "id": "github.com/clarketm/proxy-list",
+        "url": "https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt",
+        "method": "GET",
+        "parser": {
+            "text": {
+                "type": {
+                    "default": "HTTP"
+                }
+            }
+        }
+    },
+    {
+        "id": "github.com/monosans/proxy-list",
+        "url": "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/http.txt",
+        "method": "GET",
+        "parser": {
+            "text": {
+                "type": {
+                    "default": "HTTP"
+                }
+            }
+        }
+    },
+    {
+        "id": "github.com/TheSpeedX/PROXY-List",
+        "url": "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt",
+        "method": "GET",
+        "parser": {
+            "text": {
+                "type": {
+                    "default": "HTTP"
+                }
+            }
+        }
+    }
+]
