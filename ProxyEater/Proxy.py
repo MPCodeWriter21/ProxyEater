@@ -11,6 +11,8 @@ import threading  # This module is used to create threads.
 from enum import Enum
 from typing import Iterable as _Iterable, Union as _Union, Callable as _Callable
 
+__all__ = ['Proxy', 'ProxyType', 'ProxyList', 'ProxyStatus']
+
 
 class ProxyStatus(Enum):
     """

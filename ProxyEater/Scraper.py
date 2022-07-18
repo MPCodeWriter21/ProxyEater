@@ -12,6 +12,8 @@ from .Proxy import ProxyList, Proxy, ProxyType
 
 useragent_generator = UserAgent()
 
+__all__ = ['Scraper']
+
 
 class Scraper:
     is_succeed: bool = False
