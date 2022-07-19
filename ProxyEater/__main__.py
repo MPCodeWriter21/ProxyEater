@@ -39,6 +39,7 @@ def main():
         parser.add_argument('--version', '-V', help=f'The version of the program.', action='version',
                             version='%(prog)s ' + ProxyEater.__version__)
         args = parser.parse_args()
+        logger = log21.get_logger("ProxyEater", level='ERROR' if args.quiet else 'INFO')
 
         source = pathlib.Path(args.source)
         if not source.exists():
@@ -77,29 +78,10 @@ def main():
 
         # Parse the proxy
         if args.proxy:
-            if args.proxy.count(':') != 2:
-                parser.error(f'The proxy {args.proxy} is not valid.')
-                return
-            scheme = args.proxy.split(':')[0]
-            ip = args.proxy.split(':')[1]
-            port = args.proxy.split(':')[2]
-            if scheme not in ['http', 'https', 'socks4', 'socks5']:
-                parser.error(f'The proxy {args.proxy} is not valid.')
-                return
-            if scheme == 'http':
-                proxy_type = ProxyType.HTTP
-            elif scheme == 'https':
-                proxy_type = ProxyType.HTTPS
-            elif scheme == 'socks4':
-                proxy_type = ProxyType.SOCKS4
-            elif scheme == 'socks5':
-                proxy_type = ProxyType.SOCKS5
-            else:
-                parser.error(f'The proxy scheme({scheme}) is not valid.')
-                return
-            proxy = Proxy(ip, port, proxy_type)
+            proxy = Proxy.from_text(args.proxy)
         else:
             proxy = None
+        logger.info(f'Using proxy: {proxy}')
 
         if args.threads < 1:
             parser.error(f'The number of threads({args.threads}) is not valid.')
@@ -135,8 +117,6 @@ def main():
         if args.verbose and args.quiet:
             parser.error(f'The verbose and quiet are both set.')
             return
-
-        logger = log21.get_logger("ProxyEater", level='ERROR' if args.quiet else 'INFO')
 
         proxies = ProxyList()
         # Scrape

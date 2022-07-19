@@ -61,23 +61,39 @@ class Proxy:
         self.port: int = port
         self.type: ProxyType = type_
 
-    def check_status(self, timeout: int = 10, url: str = 'http://icanhazip.com/') -> bool:
+    def check_status(self, timeout: int = 10, url: str = 'http://icanhazip.com/', on_success_callback: _Callable = None,
+                     on_failure_callback: _Callable = None) -> bool:
         """
         This method is used to check if the proxy is alive.
 
         :param timeout: The timeout of the request.
         :param url: The url to try to connect to through the proxy.
+        :param on_success_callback: The callback to be called if the request succeeds.
+        :param on_failure_callback: The callback to be called if the request fails.
         :return: True if the proxy is alive, False otherwise.
         """
+        if on_success_callback is not None:
+            if not callable(on_success_callback):
+                raise TypeError('on_success_callback must be a callable.')
+        else:
+            on_success_callback = lambda proxy, status: None
+        if on_failure_callback is not None:
+            if not callable(on_failure_callback):
+                raise TypeError('on_failure_callback must be a callable.')
+        else:
+            on_failure_callback = lambda proxy, error: None
         try:
             if requests.get(url, proxies={'http': str(self), 'https': str(self)}, timeout=timeout).status_code == 200:
                 self.status = ProxyStatus.ALIVE
+                on_success_callback(self, ProxyStatus.ALIVE)
                 return True
             else:
                 self.status = ProxyStatus.DEAD
+                on_success_callback(self, ProxyStatus.DEAD)
                 return False
-        except:
+        except Exception as e:
             self.status = ProxyStatus.DEAD
+            on_failure_callback(self, e)
             return False
 
     @property
@@ -86,16 +102,23 @@ class Proxy:
 
     def check_geolocation(self, fields: str = 'status,message,continent,continentCode,country,countryCode,'
                                               'region,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,'
-                                              'query'):
+                                              'query', on_error_callback: _Callable = None) -> _Union[None, dict]:
         """
         This method is used to check the geolocation of the proxy.
 
         :param fields: The fields to be returned.
+        :param on_error_callback: The callback to be called if the request fails.
         """
+        if on_error_callback is not None:
+            if not callable(on_error_callback):
+                raise TypeError('on_error_callback must be a callable.')
+        else:
+            on_error_callback = lambda proxy, error: None
         try:
             response = requests.get(url=f"http://ip-api.com/json/{self.ip}?fields={fields}")
             self.geolocation_info = response.json()
-        except:
+        except Exception as e:
+            on_error_callback(self, e)
             return None
 
     def get_geolocation_info(self):
@@ -113,6 +136,7 @@ class Proxy:
         """
         if text.count(':') == 1:
             ip, port = text.split(':')
+            ip = ip.strip(' /')
             port = int(port)
             if default_type is None:
                 raise ValueError(f'{text}: Proxy without scheme: Default type is not specified.')
@@ -120,6 +144,7 @@ class Proxy:
                 return Proxy(ip, port, default_type)
         elif text.count(':') == 2:
             scheme, ip, port = text.split(':')
+            ip = ip.strip(' /')
             port = int(port)
             if scheme.lower() == 'http':
                 return Proxy(ip, port, ProxyType.HTTP)

@@ -58,33 +58,6 @@
         }
     },
     {
-        "id": "free-proxy-list.com",
-        "url": "https://free-proxy-list.com/?search=1&port=&speed%5B%5D=2&speed%5B%5D=3&connect_time%5B%5D=2&connect_time%5B%5D=3&up_time=0&page={page}",
-        "method": "GET",
-        "parser": {
-            "pandas": {
-                "table_index": 1,
-                "ip": "IP Address",
-                "port": "Port",
-                "combined": null,
-                "type": {
-                    "protocols": {
-                        "header": "Type",
-                        "http": "http",
-                        "https": "https",
-                        "socks4": "https",
-                        "socks5": "socks4/5"
-                    }
-                },
-                "pages": {
-                    "method": "GET",
-                    "format_name": "page",
-                    "end": "no-proxy"
-                }
-            }
-        }
-    },
-    {
         "id": "proxy-list.download-http",
         "url": "https://www.proxy-list.download/api/v2/get?l=en&t=http",
         "method": "GET",
@@ -198,30 +171,6 @@
         }
     },
     {
-        "id": "proxyscrape.com",
-        "url": "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=10000&country=all&ssl=all&anonymity=all",
-        "method": "GET",
-        "parser": {
-            "text": {
-                "type": {
-                    "default": "HTTP"
-                }
-            }
-        }
-    },
-    {
-        "id": "github.com/clarketm/proxy-list",
-        "url": "https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt",
-        "method": "GET",
-        "parser": {
-            "text": {
-                "type": {
-                    "default": "HTTP"
-                }
-            }
-        }
-    },
-    {
         "id": "github.com/monosans/proxy-list",
         "url": "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/http.txt",
         "method": "GET",
@@ -236,6 +185,69 @@
     {
         "id": "github.com/TheSpeedX/PROXY-List",
         "url": "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt",
+        "method": "GET",
+        "parser": {
+            "text": {
+                "type": {
+                    "default": "HTTP"
+                }
+            }
+        }
+    },
+    {
+        "id": "https://github.com/mertguvencli/http-proxy-list",
+        "url": "https://raw.githubusercontent.com/mertguvencli/http-proxy-list/main/proxy-list/data.txt",
+        "method": "GET",
+        "parser": {
+            "text": {
+                "type": {
+                    "default": "HTTP"
+                }
+            }
+        }
+    },
+    {
+        "id": "free-proxy-list.com",
+        "url": "https://free-proxy-list.com/?search=1&port=&speed%5B%5D=2&speed%5B%5D=3&connect_time%5B%5D=2&connect_time%5B%5D=3&up_time=0&page={page}",
+        "method": "GET",
+        "parser": {
+            "pandas": {
+                "table_index": 1,
+                "ip": "IP Address",
+                "port": "Port",
+                "combined": null,
+                "type": {
+                    "protocols": {
+                        "header": "Type",
+                        "http": "http",
+                        "https": "https",
+                        "socks4": "https",
+                        "socks5": "socks4/5"
+                    }
+                },
+                "pages": {
+                    "method": "GET",
+                    "format_name": "page",
+                    "end": "no-proxy"
+                }
+            }
+        }
+    },
+    {
+        "id": "proxyscrape.com",
+        "url": "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=10000&country=all&ssl=all&anonymity=all",
+        "method": "GET",
+        "parser": {
+            "text": {
+                "type": {
+                    "default": "HTTP"
+                }
+            }
+        }
+    },
+    {
+        "id": "github.com/clarketm/proxy-list",
+        "url": "https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt",
         "method": "GET",
         "parser": {
             "text": {

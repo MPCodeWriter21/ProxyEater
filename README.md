@@ -1,8 +1,9 @@
-ProxyEater\[1.1.2\]
+ProxyEater\[1.1.3\]
 ===================
 
 ![version](https://img.shields.io/pypi/v/ProxyEater)
 ![stars](https://img.shields.io/github/stars/MPCodeWriter21/ProxyEater)
+[![CodeFactor](https://www.codefactor.io/repository/github/mpcodewriter21/proxyeater/badge)](https://www.codefactor.io/repository/github/mpcodewriter21/proxyeater)
 
 A Python Proxy Scraper for gathering fresh proxies.
 
