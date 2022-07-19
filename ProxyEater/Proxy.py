@@ -251,6 +251,9 @@ class ProxyList(set):
                         break
                 time.sleep(0.1)
 
+        for thread in threads:
+            thread.join()
+
     def to_text(self, separator: str = "\n") -> str:
         """
         This method is used to convert the list to a text string.

@@ -1,4 +1,4 @@
-ProxyEater\[1.1.3\]
+ProxyEater\[1.2.0\]
 ===================
 
 ![version](https://img.shields.io/pypi/v/ProxyEater)
@@ -34,10 +34,15 @@ Usage
 -----
 
 ```
-usage: ProxyEater [-h] [--source SOURCE] [--output OUTPUT] [--format { text, json, csv }] [--proxy
-                  PROXY] [--threads THREADS] [--proxy-type PROXY_TYPE] [--timeout TIMEOUT]
-                  [--useragent USERAGENT] [--include-status] [--include-geolocation] [--verbose]
-                  [--quiet] [--version]
+usage: ProxyEater [-h] [--source SOURCE] [--output OUTPUT] [--format { text, json, csv }]
+                  [--threads THREADS] [--include-status] [--verbose] [--quiet] [--version]
+                  [--timeout TIMEOUT] [--proxy PROXY] [--proxy-type PROXY_TYPE] [--useragent
+                  USERAGENT] [--include-geolocation] [--source-format { text, json, csv }]
+                  [--default-type { http, https, socks4, socks5 }]
+                  mode
+
+positional arguments:
+  mode              Modes: Scrape, Check
 
 options:
   -h, --help
@@ -49,26 +54,39 @@ options:
                         The output file.
   --format { text, json, csv }, -f { text, json, csv }
                         The format of the output file(default:text).
-  --proxy PROXY, -p PROXY
-                        The proxy to use for scraping.
   --threads THREADS, -t THREADS
                         The number of threads to use for scraping(default:25).
-  --proxy-type PROXY_TYPE, -type PROXY_TYPE
-                        The type of the proxies(default:all).
-  --timeout TIMEOUT, -to TIMEOUT
-                        The timeout of the requests(default:15).
-  --useragent USERAGENT, -ua USERAGENT
-                        The useragent of the requests(default:random).
   --include-status, -is
                         Include the status of the proxies in the output file.
-  --include-geolocation, -ig
-                        Include the geolocation info of the proxies in the output file.
   --verbose, -v
                         The verbose of the program(default:False).
   --quiet, -q
                         The quiet of the program(default:False).
   --version, -V
                         The version of the program.
+  --timeout TIMEOUT, -to TIMEOUT
+                        The timeout of the requests(default:15).
+
+Scrape:
+  Scrape mode arguments
+
+  --proxy PROXY, -p PROXY
+                        The proxy to use for scraping.
+  --proxy-type PROXY_TYPE, -type PROXY_TYPE
+                        The type of the proxies(default:all).
+  --useragent USERAGENT, -ua USERAGENT
+                        The useragent of the requests(default:random).
+  --include-geolocation, -ig
+                        Include the geolocation info of the proxies in the output file.
+
+Check:
+  Check mode arguments
+
+  --source-format { text, json, csv }, -sf { text, json, csv }
+                        The format of the source file(default:text).
+  --default-type { http, https, socks4, socks5 }, -dt { http, https, socks4, socks5 }
+                        The default type of the proxies - Use this if you are providing proxies
+                        without scheme(default:http).
 
 ```
 
