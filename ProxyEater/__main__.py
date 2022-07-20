@@ -89,18 +89,18 @@ def scrape(args):
                                        on_failure_callback=error_callback)
 
         collected_proxies_count = proxies_.count
-        # Check the proxies
-        logger.info('Checking if the proxies are alive...')
-        proxies_.check_all(timeout=args.timeout, threads_no=args.threads, on_progress_callback=checking_callback)
-        if args.verbose:
-            logger.info(f'{scraper.name}: Removed {collected_proxies_count - proxies_.count} dead proxies.')
-        collected_proxies_count = proxies_.count
         # Filter the proxies
         logger.info('Filtering the proxies...')
         proxies_ = proxies_.filter(type_=proxy_types)
         if args.verbose:
-            logger.info(
-                f'{scraper.name}: Removed {collected_proxies_count - proxies_.count} proxies of wrong type.')
+            logger.info(f'{scraper.name}: Removed {collected_proxies_count - proxies_.count} proxies of wrong type.')
+        collected_proxies_count = proxies_.count
+        # Check the proxies
+        logger.info('Checking if the proxies are alive...')
+        proxies_.check_all(timeout=args.timeout, threads_no=args.threads, on_progress_callback=checking_callback,
+                           url=args.url)
+        if args.verbose:
+            logger.info(f'{scraper.name}: Removed {collected_proxies_count - proxies_.count} dead proxies.')
 
         proxies.update(proxies_)
         logger.info(f'Scraped {len(proxies)} proxies.')
@@ -153,7 +153,8 @@ def check(args):
     if args.verbose:
         logger.info('Checking if the proxies are alive...')
         logger.info('Number of proxies:', proxies.count)
-    proxies.check_all(timeout=args.timeout, threads_no=args.threads, on_progress_callback=checking_callback)
+    proxies.check_all(timeout=args.timeout, threads_no=args.threads, on_progress_callback=checking_callback,
+                      url=args.url)
     if args.verbose:
         logger.info(f'Removed {count - proxies.count} dead proxies.')
     logger.info(f'Alive proxies: {proxies.count}')
@@ -178,15 +179,17 @@ def main():
         parser.add_argument('--output', '-o', help=f'The output file.')
         parser.add_argument('--format', '-f', help=f'The format of the output file(default:text).', default='text',
                             choices=['text', 'json', 'csv'])
-        parser.add_argument('--threads', '-t', help=f'The number of threads to use for scraping(default:25).', type=int,
-                            default=25)
         parser.add_argument('--include-status', '-is', help=f'Include the status of the proxies in the output file.',
                             action='store_true')
+        parser.add_argument('--threads', '-t', help=f'The number of threads to use for scraping(default:25).', type=int,
+                            default=25)
+        parser.add_argument('--timeout', '-to', help=f'The timeout of the requests(default:15).', default=15, type=int)
+        parser.add_argument('--url', '-u', help='The url to use for checking the proxies'
+                                                '(default:http://icanhazip.com).', default='http://icanhazip.com')
         parser.add_argument('--verbose', '-v', help=f'The verbose of the program(default:False).', action='store_true')
         parser.add_argument('--quiet', '-q', help=f'The quiet of the program(default:False).', action='store_true')
         parser.add_argument('--version', '-V', help=f'The version of the program.', action='version',
                             version='%(prog)s ' + ProxyEater.__version__)
-        parser.add_argument('--timeout', '-to', help=f'The timeout of the requests(default:15).', default=15, type=int)
         scrap_arguments = parser.add_argument_group('Scrape', 'Scrape mode arguments')
         scrap_arguments.add_argument('--proxy', '-p', help=f'The proxy to use for scraping.')
         scrap_arguments.add_argument('--proxy-type', '-type', help=f'The type of the proxies(default:all).', default='')
