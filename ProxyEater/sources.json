@@ -58,6 +58,60 @@
         }
     },
     {
+        "id": "freeproxy.world",
+        "url": "https://www.freeproxy.world/?type=&anonymity=&country=&speed=10&port=&page={page}",
+        "method": "GET",
+        "parser": {
+            "pandas": {
+                "table_index": 0,
+                "ip": "IP adress",
+                "port": "Port",
+                "combined": null,
+                "type": {
+                    "protocols": {
+                        "header": "Type",
+                        "http": "http",
+                        "https": "https",
+                        "socks4": "socks4",
+                        "socks5": "socks5"
+                    }
+                },
+                "pages": {
+                    "format name": "page",
+                    "start value": 1,
+                    "end": "no-proxy"
+                }
+            }
+        }
+    },
+    {
+        "id": "free-proxy-list.com",
+        "url": "https://free-proxy-list.com/?search=1&port=&speed%5B%5D=2&speed%5B%5D=3&connect_time%5B%5D=2&connect_time%5B%5D=3&up_time=0&page={page}",
+        "method": "GET",
+        "parser": {
+            "pandas": {
+                "table_index": 1,
+                "ip": "IP Address",
+                "port": "Port",
+                "combined": null,
+                "type": {
+                    "protocols": {
+                        "header": "Type",
+                        "http": "http",
+                        "https": "https",
+                        "socks4": "socks4",
+                        "socks5": "socks4/5"
+                    }
+                },
+                "pages": {
+                    "format name": "page",
+                    "start value": 1,
+                    "end": "no-proxy"
+                }
+            }
+        }
+    },
+    {
         "id": "proxy-list.download-http",
         "url": "https://www.proxy-list.download/api/v2/get?l=en&t=http",
         "method": "GET",
@@ -202,33 +256,6 @@
             "text": {
                 "type": {
                     "default": "HTTP"
-                }
-            }
-        }
-    },
-    {
-        "id": "free-proxy-list.com",
-        "url": "https://free-proxy-list.com/?search=1&port=&speed%5B%5D=2&speed%5B%5D=3&connect_time%5B%5D=2&connect_time%5B%5D=3&up_time=0&page={page}",
-        "method": "GET",
-        "parser": {
-            "pandas": {
-                "table_index": 1,
-                "ip": "IP Address",
-                "port": "Port",
-                "combined": null,
-                "type": {
-                    "protocols": {
-                        "header": "Type",
-                        "http": "http",
-                        "https": "https",
-                        "socks4": "https",
-                        "socks5": "socks4/5"
-                    }
-                },
-                "pages": {
-                    "method": "GET",
-                    "format_name": "page",
-                    "end": "no-proxy"
                 }
             }
         }

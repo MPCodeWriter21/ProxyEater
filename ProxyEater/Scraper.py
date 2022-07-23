@@ -40,14 +40,24 @@ class Scraper:
         self.protocols_https = self.protocols.get('https', 'HTTPS')
         self.protocols_socks4 = self.protocols.get('socks4', 'SOCKS4')
         self.protocols_socks5 = self.protocols.get('socks5', 'SOCKS5')
+        self.pages_config = self.parser_config.get('pages', {})
+        self.pages_start = self.pages_config.get('start', 1)
+        self.pages_end = self.pages_config.get('end', "no-proxy")
+        if (self.pages_end != "no-proxy") and (not isinstance(self.pages_end, int)):
+            raise ValueError("The end page must be a number or 'no-proxy'.")
+        if isinstance(self.pages_end, int):
+            if self.pages_end < self.pages_start:
+                raise ValueError("The end page must be greater than the start page.")
+        self.pages_step = self.pages_config.get('step', 1)
+        self.pages_url_format_name = self.pages_config.get('format name', 'page')
         self.proxy: Proxy = proxy
         self.request_timeout: int = request_timeout
         self.proxies: ProxyList = ProxyList()
 
-    def request(self) -> requests.Response:
+    def request(self, url: str) -> requests.Response:
         return self.session.request(
             method=self.method,
-            url=self.url,
+            url=url,
             timeout=self.request_timeout,
             proxies=({'http': str(self.proxy), 'https': str(self.proxy)}) if self.proxy else None
         )
@@ -66,7 +76,7 @@ class Scraper:
             if not isinstance(on_progress_callback, _Callable):
                 raise TypeError('on_progress_callback must be a callable object.')
         else:
-            on_progress_callback = lambda obj, progress: None
+            on_progress_callback = lambda obj, progress, page: None
         if on_success_callback:
             if not isinstance(on_success_callback, _Callable):
                 raise TypeError('on_success_callback must be a callable object.')
@@ -77,49 +87,55 @@ class Scraper:
                 raise TypeError('on_failure_callback must be a callable object.')
         else:
             on_failure_callback = lambda obj, exception: None
-        try:
-            on_progress_callback(self, progress=0)
-            response = self.request()
-            on_progress_callback(self, progress=10)
+
+        def _get_proxies(page: int = 1) -> 'ProxyList':
+            proxies_ = ProxyList()
+            on_progress_callback(self, progress=0, page=page)
+            response = self.request(self.url.format(page=page))
+            on_progress_callback(self, progress=10, page=page)
             if self.parser_type == "pandas":
                 df = pandas.read_html(response.text)[self.parser_config.get('table_index', 0)]
                 for x in range(0, len(df)):
-                    on_progress_callback(self, progress=10 + (x / len(df) * 90))
-                    if not self.parser_config.get('combined', None):
-                        ip = str(df.loc[df.index[x], self.parser_config.get('ip')]).strip()
-                        port = int(df.loc[df.index[x], self.parser_config.get('port')])
-                        if self.is_https_header:
-                            if str(df.loc[df.index[x], self.is_https_header]).strip().lower() == self.is_https_value:
-                                self.proxies.add(Proxy(ip, port, ProxyType.HTTPS))
-                            else:
-                                self.proxies.add(Proxy(ip, port, self.default_type))
-                            continue
-                        if self.protocols_header:
-                            protocol = str(df.loc[df.index[x], self.protocols_header]).strip().lower()
-                            if protocol == self.protocols_http:
-                                self.proxies.add(Proxy(ip, port, ProxyType.HTTP))
-                            elif protocol == self.protocols_https:
-                                self.proxies.add(Proxy(ip, port, ProxyType.HTTPS))
-                            elif protocol == self.protocols_socks4:
-                                self.proxies.add(Proxy(ip, port, ProxyType.SOCKS4))
-                            elif protocol == self.protocols_socks5:
-                                self.proxies.add(Proxy(ip, port, ProxyType.SOCKS5))
-                            else:
-                                self.proxies.add(Proxy(ip, port, self.default_type))
-                            continue
-                        self.proxies.add(Proxy(ip, port, self.default_type))
-                    else:
-                        combined: str = df.loc[df.index[x], self.parser_config.get('combined')]
-                        if len(combined.split(':')) == 2:
-                            ip = combined.split(':')[0].strip()
-                            port = int(combined.split(':')[1])
-                            self.proxies.add(Proxy(ip, port, ProxyType.HTTP))
+                    on_progress_callback(self, progress=10 + (x / len(df) * 90), page=page)
+                    try:
+                        if not self.parser_config.get('combined', None):
+                            ip = str(df.loc[df.index[x], self.parser_config.get('ip')]).strip()
+                            port = int(df.loc[df.index[x], self.parser_config.get('port')])
+                            if self.is_https_header:
+                                if str(df.loc[
+                                           df.index[x], self.is_https_header]).strip().lower() == self.is_https_value:
+                                    proxies_.add(Proxy(ip, port, ProxyType.HTTPS))
+                                else:
+                                    proxies_.add(Proxy(ip, port, self.default_type))
+                                continue
+                            if self.protocols_header:
+                                protocol = str(df.loc[df.index[x], self.protocols_header]).strip().lower()
+                                if protocol == self.protocols_http:
+                                    proxies_.add(Proxy(ip, port, ProxyType.HTTP))
+                                elif protocol == self.protocols_https:
+                                    proxies_.add(Proxy(ip, port, ProxyType.HTTPS))
+                                elif protocol == self.protocols_socks4:
+                                    proxies_.add(Proxy(ip, port, ProxyType.SOCKS4))
+                                elif protocol == self.protocols_socks5:
+                                    proxies_.add(Proxy(ip, port, ProxyType.SOCKS5))
+                                else:
+                                    proxies_.add(Proxy(ip, port, self.default_type))
+                                continue
+                            proxies_.add(Proxy(ip, port, self.default_type))
+                        else:
+                            combined: str = df.loc[df.index[x], self.parser_config.get('combined')]
+                            if len(combined.split(':')) == 2:
+                                ip = combined.split(':')[0].strip()
+                                port = int(combined.split(':')[1])
+                                proxies_.add(Proxy(ip, port, ProxyType.HTTP))
+                    except:
+                        continue
 
             if self.parser_type == "json":
                 data = response.json()[self.parser_config.get('data')]
                 for i, x in enumerate(data):
-                    on_progress_callback(self, progress=10 + (i / len(data) * 90))
-                    self.proxies.add(Proxy(
+                    on_progress_callback(self, progress=10 + (i / len(data) * 90), page=page)
+                    proxies_.add(Proxy(
                         str(x[self.parser_config.get('ip', '')]).strip(),
                         int(x[self.parser_config.get('port', '')]),
                         self.default_type
@@ -128,13 +144,34 @@ class Scraper:
             if self.parser_type == "text":
                 data = str(response.content, encoding='utf-8')
                 for i, x in enumerate(data.split('\n')):
-                    on_progress_callback(self, progress=10 + (i / len(data.split('\n')) * 90))
+                    on_progress_callback(self, progress=10 + (i / len(data) * 90), page=page)
                     if len(x.split(':')) == 2:
-                        self.proxies.add(Proxy(
+                        proxies_.add(Proxy(
                             x.split(':')[0].strip(),
                             int(x.split(':')[1]),
                             self.default_type
                         ))
+
+            on_progress_callback(self, progress=100, page=page)
+
+            return proxies_
+
+        try:
+            if self.pages_config:
+                page_index = self.pages_start
+                while True:
+                    if self.pages_end == "no-proxy":
+                        proxies = _get_proxies(page_index)
+                        if proxies.count < 1:
+                            break
+                    elif page_index <= self.pages_end:
+                        proxies = _get_proxies(page_index)
+                    else:
+                        raise ValueError('The pages_end value must be "no-proxy" or a number.')
+                    page_index += self.pages_step
+                    self.proxies.update(proxies)
+            else:
+                self.proxies.update(_get_proxies())
 
             self.is_succeed = True
             on_success_callback(self)

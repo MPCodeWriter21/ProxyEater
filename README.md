@@ -1,4 +1,4 @@
-ProxyEater\[1.2.1\]
+ProxyEater\[1.3.0\]
 ===================
 
 ![version](https://img.shields.io/pypi/v/ProxyEater)
@@ -48,8 +48,7 @@ options:
   -h, --help
                         show this help message and exit
   --source SOURCE, -s SOURCE
-                        The source of the proxies(default:C:\Users\Morteza\AppData\Local\Programs\
-                        Python\Python310\lib\site-packages\ProxyEater\sources.json).
+                        The source of the proxies(default:*\Python\Python310\lib\site-packages\ProxyEater\sources.json).
   --output OUTPUT, -o OUTPUT
                         The output file.
   --format { text, json, csv }, -f { text, json, csv }

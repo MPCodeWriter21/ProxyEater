@@ -36,29 +36,22 @@ def scrape(args):
     # Parse the proxy
     if args.proxy:
         proxy = Proxy.from_text(args.proxy)
+        logger.info(f'Using proxy: {proxy}')
     else:
         proxy = None
-    logger.info(f'Using proxy: {proxy}')
 
-    proxy_types = ['http', 'https', 'socks4', 'socks5']
+    proxy_types = []
     # Parse the proxy type
     if args.proxy_type:
-        proxy_types = []
-        for type_ in [x.strip() for x in args.proxy_type.split(',')]:
-            if type_ == 'http':
-                proxy_type = ProxyType.HTTP
-            elif type_ == 'https':
-                proxy_type = ProxyType.HTTPS
-            elif type_ == 'socks4':
-                proxy_type = ProxyType.SOCKS4
-            elif type_ == 'socks5':
-                proxy_type = ProxyType.SOCKS5
-            else:
-                logger.error(f'The proxy type({type_}) is not valid.')
-                return
-            proxy_types.append(proxy_type)
-    # Convert proxy types to ProxyType objects
-    proxy_types = [ProxyType.from_name(str(x)) for x in proxy_types]
+        proxy_types = [x.strip() for x in args.proxy_type.split(',')]
+    if not proxy_types:
+        proxy_types = ['http', 'https', 'socks4', 'socks5']
+    try:
+        proxy_types = [ProxyType.from_name(x) for x in proxy_types]
+    except ValueError as e:
+        logger.error(e)
+        return
+    logger.info(f'Using proxy types: {[proxy_type.name for proxy_type in proxy_types]}')
 
     useragent = args.useragent
 
@@ -69,8 +62,9 @@ def scrape(args):
         if args.verbose:
             logger.progress_bar = log21.ProgressBar(format_='{prefix}{bar}{suffix} {percentage}%', style='{')
 
-            def progress_callback(scraper_: Scraper, progress: float):
-                logger.info(f'{scraper_.name}: Collected: {scraper_.proxies.count}, {progress:.2f}%', end='\r')
+            def progress_callback(scraper_: Scraper, progress: float, page: int):
+                logger.info(f'{scraper_.name}: Collected: {scraper_.proxies.count}; Page: {page}, {progress:.2f}%',
+                            end='\r')
 
             def finish_callback(scraper_: Scraper):
                 logger.info(f'{scraper_.name}: Collected: {scraper_.proxies.count}, 100.0%')
@@ -96,11 +90,12 @@ def scrape(args):
             logger.info(f'{scraper.name}: Removed {collected_proxies_count - proxies_.count} proxies of wrong type.')
         collected_proxies_count = proxies_.count
         # Check the proxies
-        logger.info('Checking if the proxies are alive...')
-        proxies_.check_all(timeout=args.timeout, threads_no=args.threads, on_progress_callback=checking_callback,
-                           url=args.url)
-        if args.verbose:
-            logger.info(f'{scraper.name}: Removed {collected_proxies_count - proxies_.count} dead proxies.')
+        if collected_proxies_count > 0:
+            logger.info('Checking if the proxies are alive...')
+            proxies_.check_all(timeout=args.timeout, threads_no=args.threads, on_progress_callback=checking_callback,
+                               url=args.url)
+            if args.verbose:
+                logger.info(f'{scraper.name}: Removed {collected_proxies_count - proxies_.count} dead proxies.')
 
         proxies.update(proxies_)
         logger.info(f'Scraped {len(proxies)} proxies.')
