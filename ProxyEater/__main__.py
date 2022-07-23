@@ -90,7 +90,7 @@ def scrape(args):
             logger.info(f'{scraper.name}: Removed {collected_proxies_count - proxies_.count} proxies of wrong type.')
         collected_proxies_count = proxies_.count
         # Check the proxies
-        if collected_proxies_count > 0:
+        if collected_proxies_count > 0 and not args.no_check:
             logger.info('Checking if the proxies are alive...')
             proxies_.check_all(timeout=args.timeout, threads_no=args.threads, on_progress_callback=checking_callback,
                                url=args.url)
@@ -191,6 +191,9 @@ def main():
         scrap_arguments.add_argument('--useragent', '-ua', help=f'The useragent of the requests(default:random).')
         scrap_arguments.add_argument('--include-geolocation', '-ig',
                                      help=f'Include the geolocation info of the proxies in the output file.',
+                                     action='store_true')
+        scrap_arguments.add_argument('--no-check', '-nc',
+                                     help=f'Use this option to skip the checking of the proxies after ',
                                      action='store_true')
         check_arguments = parser.add_argument_group('Check', 'Check mode arguments')
         check_arguments.add_argument('--source-format', '-sf', help=f'The format of the source file(default:text).',
