@@ -7,7 +7,7 @@ with open('README.md', 'r') as f:
 
 setup(
     name='ProxyEater',
-    version='1.4.0',
+    version='1.4.1',
     author='CodeWriter21',
     author_email='CodeWriter21@gmail.com',
     description='A Python Proxy Scraper for gathering fresh proxies.',
@@ -20,7 +20,8 @@ setup(
             'ProxyEater=ProxyEater.__main__:main'
         ]
     },
-    install_requires=['requests', 'beautifulsoup4', 'lxml', 'pandas', 'html5lib', 'log21', 'importlib_resources'],
+    install_requires=['requests', 'beautifulsoup4', 'lxml', 'pandas', 'html5lib', 'log21>=2.3.3',
+                      'importlib_resources', 'random_user_agent'],
     classifiers=[
         'Programming Language :: Python :: 3',
     ],

@@ -1,6 +1,6 @@
 # ProxyEater.__main__.py
 # CodeWriter21
-
+import os
 import sys
 import json
 import pathlib
@@ -60,7 +60,8 @@ def scrape(args):
     for config in source_data:
         progress_callback = finish_callback = error_callback = checking_callback = None
         if args.verbose:
-            logger.progress_bar = log21.ProgressBar(format_='{prefix}{bar}{suffix} {percentage}%', style='{')
+            logger.progress_bar = log21.ProgressBar(format_='Proxies: {count} {prefix}{bar}{suffix} {percentage}%',
+                                                    style='{', additional_variables={'count': 0})
 
             def progress_callback(scraper_: Scraper, progress: float, page: int):
                 logger.info(f'{scraper_.name}: Collected: {scraper_.proxies.count}; Page: {page}, {progress:.2f}%',
@@ -74,7 +75,7 @@ def scrape(args):
                 logger.error(f'{scraper_.name}: {error.__class__.__name__}: {error}')
 
             def checking_callback(proxy_list: ProxyList, progress: float):
-                logger.progress_bar(progress, 100)
+                logger.progress_bar(progress, 100, count=proxy_list.count)
 
         logger.info(f'Scraping {config.get("id")}...')
         scraper = Scraper(config.get('url'), config.get('parser'), method=config.get('method'),
@@ -100,18 +101,20 @@ def scrape(args):
         proxies.update(proxies_)
         logger.info(f'Scraped {len(proxies)} proxies.')
 
-        if args.verbose:
-            logger.info(f'Writing {proxies.count} proxies to {args.output}...')
-        # Write to file
-        if args.format == 'text':
-            proxies.to_text_file(args.output, '\n')
-        elif args.format == 'json':
-            proxies.to_json_file(args.output, include_status=args.include_status,
-                                 include_geolocation=args.include_geolocation)
-        elif args.format == 'csv':
-            proxies.to_csv_file(args.output, include_status=args.include_status,
-                                include_geolocation=args.include_geolocation)
-    logger.info(f'Wrote {proxies.count} proxies to {args.output}.')
+        if proxies.count > 0:
+            if args.verbose:
+                logger.info(f'Writing {proxies.count} proxies to {args.output}...')
+            # Write to file
+            if args.format == 'text':
+                proxies.to_text_file(args.output, '\n')
+            elif args.format == 'json':
+                proxies.to_json_file(args.output, include_status=args.include_status,
+                                     include_geolocation=args.include_geolocation)
+            elif args.format == 'csv':
+                proxies.to_csv_file(args.output, include_status=args.include_status,
+                                    include_geolocation=args.include_geolocation)
+    if proxies.count > 0:
+        logger.info(f'Wrote {proxies.count} proxies to {args.output}.')
 
 
 def check(args):
@@ -138,10 +141,11 @@ def check(args):
         logger.error(f'The source format {args.source_format} is not valid.')
         return
 
-    logger.progress_bar = log21.ProgressBar(format_='{prefix}{bar}{suffix} {percentage}%', style='{')
+    logger.progress_bar = log21.ProgressBar(format_='Proxies: {count} {prefix}{bar}{suffix} {percentage}%', style='{',
+                                            additional_variables={'count': 0})
 
     def checking_callback(proxy_list: ProxyList, progress: float):
-        logger.progress_bar(progress, 100)
+        logger.progress_bar(progress, 100, count=proxy_list.count)
 
     # Check the proxies
     count = proxies.count
@@ -154,16 +158,17 @@ def check(args):
         logger.info(f'Removed {count - proxies.count} dead proxies.')
     logger.info(f'Alive proxies: {proxies.count}')
 
-    # Write to file
-    if args.format == 'text':
-        proxies.to_text_file(args.output, '\n')
-    elif args.format == 'json':
-        proxies.to_json_file(args.output, include_status=args.include_status,
-                             include_geolocation=args.include_geolocation)
-    elif args.format == 'csv':
-        proxies.to_csv_file(args.output, include_status=args.include_status,
-                            include_geolocation=args.include_geolocation)
-    logger.info(f'Wrote {proxies.count} proxies to {args.output}.')
+    if proxies.count > 0:
+        # Write to file
+        if args.format == 'text':
+            proxies.to_text_file(args.output, '\n')
+        elif args.format == 'json':
+            proxies.to_json_file(args.output, include_status=args.include_status,
+                                 include_geolocation=args.include_geolocation)
+        elif args.format == 'csv':
+            proxies.to_csv_file(args.output, include_status=args.include_status,
+                                include_geolocation=args.include_geolocation)
+        logger.info(f'Wrote {proxies.count} proxies to {args.output}.')
 
 
 def main():
@@ -249,9 +254,15 @@ def main():
         elif args.mode == 'check':
             check(args)
     except KeyboardInterrupt:
+        try:
+            terminal_size = os.get_terminal_size()[0] - 1
+        except OSError:
+            terminal_size = 50
+        if not terminal_size:
+            terminal_size = 50
+        logger.clear_line(terminal_size)
         logger.error('KeyboardInterrupt: Exiting...')
         sys.exit()
-        return
 
 
 if __name__ == '__main__':

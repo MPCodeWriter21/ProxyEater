@@ -1,4 +1,4 @@
-ProxyEater\[1.4.0\]
+ProxyEater\[1.4.1\]
 ===================
 
 ![version](https://img.shields.io/pypi/v/ProxyEater)

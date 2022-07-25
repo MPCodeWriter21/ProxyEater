@@ -237,13 +237,37 @@
         }
     },
     {
-        "id": "github.com/TheSpeedX/PROXY-List",
+        "id": "github.com/TheSpeedX/PROXY-List/http.txt",
         "url": "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt",
         "method": "GET",
         "parser": {
             "text": {
                 "type": {
                     "default": "HTTP"
+                }
+            }
+        }
+    },
+    {
+        "id": "github.com/TheSpeedX/PROXY-List/socks5.txt",
+        "url": "https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/socks5.txt",
+        "method": "GET",
+        "parser": {
+            "text": {
+                "type": {
+                    "default": "SOCKS5"
+                }
+            }
+        }
+    },
+    {
+        "id": "github.com/TheSpeedX/PROXY-List/socks4",
+        "url": "https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/socks4.txt",
+        "method": "GET",
+        "parser": {
+            "text": {
+                "type": {
+                    "default": "SOCKS4"
                 }
             }
         }

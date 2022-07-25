@@ -243,13 +243,13 @@ class ProxyList(set):
             thread = threading.Thread(target=check_proxy, args=(proxy,))
             threads.append(thread)
             thread.start()
-            on_progress_callback(self, (i + 1) / length * 100)
             while len(threads) >= threads_no:
                 for thread in threads:
                     if not thread.is_alive():
                         threads.remove(thread)
                         break
                 time.sleep(0.1)
+            on_progress_callback(self, (i + 1) / length * 100)
 
         for thread in threads:
             thread.join()
