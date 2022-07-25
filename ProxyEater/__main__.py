@@ -255,7 +255,7 @@ def main():
             check(args)
     except KeyboardInterrupt:
         try:
-            terminal_size = os.get_terminal_size()[0] - 1
+            terminal_size = os.get_terminal_size()[0]
         except OSError:
             terminal_size = 50
         if not terminal_size:
