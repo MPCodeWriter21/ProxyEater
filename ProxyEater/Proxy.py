@@ -249,7 +249,7 @@ class ProxyList(set):
                         threads.remove(thread)
                         break
                 time.sleep(0.1)
-            on_progress_callback(self, (i + 1) / length * 100)
+            on_progress_callback(self, i / length * 100)
 
         for thread in threads:
             thread.join()
