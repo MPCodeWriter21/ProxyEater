@@ -1,8 +1,8 @@
 # ProxyEater.__main__.py
 # CodeWriter21
-import os
 import sys
 import json
+import shutil
 import pathlib
 
 import log21
@@ -255,7 +255,7 @@ def main():
             check(args)
     except KeyboardInterrupt:
         try:
-            terminal_size = os.get_terminal_size()[0]
+            terminal_size = shutil.get_terminal_size().columns
         except OSError:
             terminal_size = 50
         if not terminal_size:
