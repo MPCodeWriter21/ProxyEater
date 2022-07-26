@@ -1,7 +1,7 @@
 # ProxyEater
 # CodeWriter21
 
-__version__ = "1.4.5"
+__version__ = "1.5.0"
 __author__ = "CodeWriter21"
 __email__ = "CodeWriter21@gmail.com"
 __license__ = "Apache-2.0"

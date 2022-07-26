@@ -102,15 +102,28 @@ def scrape(args):
         logger.info(f'Scraped {len(proxies)} proxies.')
 
         if proxies.count > 0:
+            if args.include_geolocation:
+                on_progress_callback = on_error_callback = None
+                if args.verbose:
+                    logger.progress_bar = log21.ProgressBar()
+
+                    def on_progress_callback(proxy_list: ProxyList, progress: float):
+                        logger.progress_bar(progress, 100)
+
+                    def on_error_callback(proxy_list: ProxyList, error: Exception):
+                        logger.error(f'{error.__class__.__name__}: {error}')
+                logger.info('Getting the geolocation info of the proxies...')
+                proxies.batch_collect_geolocations(on_progress_callback=on_progress_callback,
+                                                   on_error_callback=on_error_callback)
             if args.verbose:
                 logger.info(f'Writing {proxies.count} proxies to {args.output}...')
             # Write to file
-            if args.format == 'text':
-                proxies.to_text_file(args.output, '\n')
-            elif args.format == 'json':
+            if args.file_format == 'text':
+                proxies.to_text_file(args.output, '\n', format_=args.format)
+            elif args.file_format == 'json':
                 proxies.to_json_file(args.output, include_status=args.include_status,
                                      include_geolocation=args.include_geolocation)
-            elif args.format == 'csv':
+            elif args.file_format == 'csv':
                 proxies.to_csv_file(args.output, include_status=args.include_status,
                                     include_geolocation=args.include_geolocation)
     if proxies.count > 0:
@@ -159,13 +172,26 @@ def check(args):
     logger.info(f'Alive proxies: {proxies.count}')
 
     if proxies.count > 0:
+        if args.include_geolocation:
+            on_progress_callback = on_error_callback = None
+            if args.verbose:
+                logger.progress_bar = log21.ProgressBar()
+
+                def on_progress_callback(proxy_list: ProxyList, progress: float):
+                    logger.progress_bar(progress, 100)
+
+                def on_error_callback(proxy_list: ProxyList, error: Exception):
+                    logger.error(f'{error.__class__.__name__}: {error}')
+            logger.info('Getting the geolocation info of the proxies...')
+            proxies.batch_collect_geolocations(on_progress_callback=on_progress_callback,
+                                               on_error_callback=on_error_callback)
         # Write to file
-        if args.format == 'text':
-            proxies.to_text_file(args.output, '\n')
-        elif args.format == 'json':
+        if args.file_format == 'text':
+            proxies.to_text_file(args.output, '\n', format_=args.format)
+        elif args.file_format == 'json':
             proxies.to_json_file(args.output, include_status=args.include_status,
                                  include_geolocation=args.include_geolocation)
-        elif args.format == 'csv':
+        elif args.file_format == 'csv':
             proxies.to_csv_file(args.output, include_status=args.include_status,
                                 include_geolocation=args.include_geolocation)
         logger.info(f'Wrote {proxies.count} proxies to {args.output}.')
@@ -177,8 +203,12 @@ def main():
         parser.add_argument('mode', help='Modes: Scrape, Check')
         parser.add_argument('--source', '-s', help=f'The source of the proxies(default:{path / "sources.json"}).')
         parser.add_argument('--output', '-o', help=f'The output file.')
-        parser.add_argument('--format', '-f', help=f'The format of the output file(default:text).', default='text',
+        parser.add_argument('--file-format', '-ff', help=f'The format of the output file(default:text).',
+                            default='text',
                             choices=['text', 'json', 'csv'])
+        parser.add_argument('--format', '-f', help='The format for saving the proxies in text file(default:'
+                                                   '"{scheme}://{ip}:{port}").',
+                            default='{scheme}://{ip}:{port}')
         parser.add_argument('--include-status', '-is', help=f'Include the status of the proxies in the output file.',
                             action='store_true')
         parser.add_argument('--threads', '-t', help=f'The number of threads to use for scraping(default:25).', type=int,
@@ -228,25 +258,20 @@ def main():
         if args.output:
             args.output = pathlib.Path(args.output)
         else:
-            if args.format == 'text':
+            if args.file_format == 'text':
                 ext = 'txt'
-            elif args.format == 'json':
+            elif args.file_format == 'json':
                 ext = 'json'
-            elif args.format == 'csv':
+            elif args.file_format == 'csv':
                 ext = 'csv'
             else:
-                parser.error(f'The format {args.format} is not supported.')
+                parser.error(f'The format {args.file_format} is not supported.')
                 return
             args.output = pathlib.Path('.') / ('proxies.' + ext)
             i = 2
             while args.output.exists():
                 args.output = pathlib.Path('.') / f'proxies-{i}.{ext}'
                 i += 1
-
-        # Output Format
-        if args.format == 'text' and (args.include_status or args.include_geolocation):
-            parser.error(f'The format {args.format} does not support the include-status or include-geolocation.')
-            return
 
         args.mode = args.mode.lower()
         if args.mode == 'scrape':

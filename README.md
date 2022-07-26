@@ -1,4 +1,4 @@
-ProxyEater\[1.4.5\]
+ProxyEater\[1.5.0\]
 ===================
 
 ![version](https://img.shields.io/pypi/v/ProxyEater)
@@ -34,11 +34,12 @@ Usage
 -----
 
 ```
-usage: ProxyEater [-h] [--source SOURCE] [--output OUTPUT] [--format { text, json, csv }]
-                  [--threads THREADS] [--include-status] [--verbose] [--quiet] [--version]
-                  [--timeout TIMEOUT] [--proxy PROXY] [--proxy-type PROXY_TYPE] [--useragent
-                  USERAGENT] [--include-geolocation] [--source-format { text, json, csv }]
-                  [--default-type { http, https, socks4, socks5 }]
+usage: ProxyEater [-h] [--source SOURCE] [--output OUTPUT] [--file-format { text, json, csv }]
+                  [--format FORMAT] [--include-status] [--threads THREADS] [--timeout TIMEOUT]
+                  [--url URL] [--verbose] [--quiet] [--version] [--proxy PROXY] [--proxy-type
+                  PROXY_TYPE] [--useragent USERAGENT] [--include-geolocation] [--no-check]
+                  [--source-format { text, json, csv }] [--default-type { http, https, socks4,
+                  socks5 }]
                   mode
 
 positional arguments:
@@ -48,23 +49,29 @@ options:
   -h, --help
                         show this help message and exit
   --source SOURCE, -s SOURCE
-                        The source of the proxies(default:*\Python\Python310\lib\site-packages\ProxyEater\sources.json).
+                        The source of the proxies(default:C:\Users\Morteza\AppData\Local\Programs\
+                        Python\Python310\lib\site-packages\ProxyEater\sources.json).
   --output OUTPUT, -o OUTPUT
                         The output file.
-  --format { text, json, csv }, -f { text, json, csv }
+  --file-format { text, json, csv }, -ff { text, json, csv }
                         The format of the output file(default:text).
-  --threads THREADS, -t THREADS
-                        The number of threads to use for scraping(default:25).
+  --format FORMAT, -f FORMAT
+                        The format for saving the proxies in text
+                        file(default:"{scheme}://{ip}:{port}").
   --include-status, -is
                         Include the status of the proxies in the output file.
+  --threads THREADS, -t THREADS
+                        The number of threads to use for scraping(default:25).
+  --timeout TIMEOUT, -to TIMEOUT
+                        The timeout of the requests(default:15).
+  --url URL, -u URL
+                        The url to use for checking the proxies(default:http://icanhazip.com).
   --verbose, -v
                         The verbose of the program(default:False).
   --quiet, -q
                         The quiet of the program(default:False).
   --version, -V
                         The version of the program.
-  --timeout TIMEOUT, -to TIMEOUT
-                        The timeout of the requests(default:15).
 
 Scrape:
   Scrape mode arguments
@@ -77,6 +84,8 @@ Scrape:
                         The useragent of the requests(default:random).
   --include-geolocation, -ig
                         Include the geolocation info of the proxies in the output file.
+  --no-check, -nc
+                        Use this option to skip the checking of the proxies after
 
 Check:
   Check mode arguments

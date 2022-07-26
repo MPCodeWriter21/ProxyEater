@@ -59,6 +59,8 @@ class Proxy:
     def __init__(self, ip: str, port: int, type_: ProxyType) -> None:
         self.ip: str = ip
         self.port: int = port
+        if isinstance(type_, str):
+            type_ = ProxyType.from_name(type_)
         self.type: ProxyType = type_
 
     def check_status(self, timeout: int = 10, url: str = 'http://icanhazip.com/', on_success_callback: _Callable = None,
@@ -179,8 +181,19 @@ class Proxy:
             'port': self.port,
             'type': self.type.name,
             'status': self.status.name,
+            'scheme': self.type.name.lower(),
             'geolocation_info': self.geolocation_info
         }
+
+    def __iter__(self):
+        return iter((
+            ('ip', self.ip),
+            ('port', self.port),
+            ('type', self.type.name),
+            ('status', self.status.name),
+            ('scheme', self.type.name.lower()),
+            ('geolocation_info', self.geolocation_info)
+        ))
 
 
 class ProxyList(set):
@@ -256,38 +269,50 @@ class ProxyList(set):
 
         on_progress_callback(self, 100)
 
-    def to_text(self, separator: str = "\n") -> str:
+    def to_text(self, separator: str = "\n", format_: str = '{scheme}://{ip}:{port}') -> str:
         """
         This method is used to convert the list to a text string.
+
+        :param separator: The separator between proxies.
+        :param format_: The format of each proxy.
+        :return: The text string.
         """
-        return separator.join(str(proxy) for proxy in self)
+        return separator.join(format_.format(**dict(proxy)) for proxy in self)
 
     def batch_collect_geolocations(self, fields: str = 'status,message,continent,continentCode,country,countryCode,'
                                                        'region,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,'
-                                                       'query', on_progress_callback: _Callable = None):
+                                                       'query', on_progress_callback: _Callable = None,
+                                   on_error_callback: _Callable = None) -> None:
         """
         This method is used to collect the geolocation of all proxies in the list.
 
         :param fields: The fields to be returned.
         :param on_progress_callback: A callback function to be called on each progress.
+        :param on_error_callback: A callback function to be called on each error.
         """
         if on_progress_callback is not None:
             if not callable(on_progress_callback):
-                raise TypeError(
-                    "ProxyList.batch_collect_geolocations() argument on_progress_callback must be a callable.")
+                raise TypeError("ProxyList.batch_collect_geolocations() argument on_progress_callback must be a"
+                                " callable.")
         else:
             on_progress_callback = lambda proxy_list, progress: None
+        if on_error_callback is not None:
+            if not callable(on_error_callback):
+                raise TypeError("ProxyList.batch_collect_geolocations() argument on_error_callback must be a callable.")
+        else:
+            on_error_callback = lambda proxy_list, error: None
         all_proxies = list(self)
         for start_index in range(0, len(self), 100):
-            end_index = start_index + 100
+            end_index = start_index + 100 if start_index + 100 < len(self) else len(self)
             proxies = all_proxies[start_index:end_index]
             try:
-                response = requests.post(url=f"http://ip-api.com/batch?fields={fields}", data=proxies)
+                response = requests.post(url=f"http://ip-api.com/batch?fields={fields}",
+                                         json=[proxy.ip for proxy in proxies]).json()
                 for index, proxy in enumerate(proxies):
-                    proxy.geolocation_info = response.json()[index]
+                    proxy.geolocation_info = response[index]
+                on_progress_callback(self, end_index / len(self) * 100)
             except Exception as e:
-                raise Exception("Failed to collect geolocation information.", e)
-            on_progress_callback(self, (end_index + 1) / len(self) * 100)
+                on_error_callback(self, Exception("Failed to collect geolocation information.", e))
 
     def to_json(self, indent: int = 4, include_status: bool = True, include_geolocation: bool = True) -> str:
         """
@@ -315,15 +340,17 @@ class ProxyList(set):
 
         return json.dumps(proxies, indent=indent)
 
-    def to_text_file(self, filename: _Union[str, os.PathLike], separator: str = "\n") -> None:
+    def to_text_file(self, filename: _Union[str, os.PathLike], separator: str = "\n",
+                     format_: str = '{scheme}://{ip}:{port}') -> None:
         """
         This method is used to write the list to a text file.
 
         :param filename: The name of the text file.
         :param separator: The separator of the text file.
+        :param format_: The format of each proxy.
         """
         with open(filename, 'w') as f:
-            f.write(self.to_text(separator))
+            f.write(self.to_text(separator, format_))
 
     def to_json_file(self, filename: _Union[str, os.PathLike], indent: int = 4, include_status: bool = True,
                      include_geolocation: bool = True) -> None:
