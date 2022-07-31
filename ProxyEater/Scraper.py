@@ -3,8 +3,8 @@
 
 from typing import Callable as _Callable
 
-import requests  # This module is used to send requests to the server.
 import pandas  # This module is used to parse the html table.
+import requests  # This module is used to send requests to the server.
 
 from random_user_agent.user_agent import UserAgent  # This module is used to generate random user agents.
 

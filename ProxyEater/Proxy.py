@@ -245,14 +245,25 @@ class ProxyList(set):
         else:
             on_progress_callback = lambda proxy_list, progress: None
 
+        length = len(self)
+        finished: int = 0  # The number of proxies that have been checked.
+
         def check_proxy(proxy_: Proxy):
+            """
+            This function is used for checking the status of a proxy.
+
+            :param proxy_: The proxy to check.
+            :return:
+            """
+            nonlocal finished
             proxy_.check_status(timeout, url)
             if (not proxy_.is_alive) and remove_dead:
                 self.remove(proxy_)
+            finished += 1
+            on_progress_callback(self, finished / length * 99.99)
 
         threads = []
-        length = len(self)
-        for i, proxy in enumerate(self.copy()):
+        for proxy in self.copy():
             thread = threading.Thread(target=check_proxy, args=(proxy,))
             threads.append(thread)
             thread.start()
@@ -262,8 +273,8 @@ class ProxyList(set):
                         threads.remove(thread)
                         break
                 time.sleep(0.1)
-            on_progress_callback(self, i / length * 100)
 
+        # Wait for all threads to finish
         for thread in threads:
             thread.join()
 

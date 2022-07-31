@@ -40,19 +40,6 @@ def scrape(args):
     else:
         proxy = None
 
-    proxy_types = []
-    # Parse the proxy type
-    if args.proxy_type:
-        proxy_types = [x.strip() for x in args.proxy_type.split(',')]
-    if not proxy_types:
-        proxy_types = ['http', 'https', 'socks4', 'socks5']
-    try:
-        proxy_types = [ProxyType.from_name(x) for x in proxy_types]
-    except ValueError as e:
-        logger.error(e)
-        return
-    logger.info(f'Using proxy types: {[proxy_type.name for proxy_type in proxy_types]}')
-
     useragent = args.useragent
 
     proxies = ProxyList()
@@ -86,7 +73,7 @@ def scrape(args):
         collected_proxies_count = proxies_.count
         # Filter the proxies
         logger.info('Filtering the proxies...')
-        proxies_ = proxies_.filter(type_=proxy_types)
+        proxies_ = proxies_.filter(type_=args.proxy_types)
         if args.verbose:
             logger.info(f'{scraper.name}: Removed {collected_proxies_count - proxies_.count} proxies of wrong type.')
         collected_proxies_count = proxies_.count
@@ -154,6 +141,14 @@ def check(args):
         logger.error(f'The source format {args.source_format} is not valid.')
         return
 
+    if len(args.proxy_types) < 4:
+        loaded_proxies_count = proxies.count
+        # Filter the proxies
+        logger.info('Filtering the proxies...')
+        proxies = proxies.filter(type_=args.proxy_types)
+        if args.verbose:
+            logger.info(f'Removed {loaded_proxies_count - proxies.count} proxies of wrong type.')
+
     logger.progress_bar = log21.ProgressBar(format_='Proxies: {count} {prefix}{bar}{suffix} {percentage}%', style='{',
                                             additional_variables={'count': 0})
 
@@ -209,6 +204,7 @@ def main():
         parser.add_argument('--format', '-f', help='The format for saving the proxies in text file(default:'
                                                    '"{scheme}://{ip}:{port}").',
                             default='{scheme}://{ip}:{port}')
+        parser.add_argument('--proxy-type', '-type', help=f'The type of the proxies(default:all).', default='')
         parser.add_argument('--include-status', '-is', help=f'Include the status of the proxies in the output file.',
                             action='store_true')
         parser.add_argument('--threads', '-t', help=f'The number of threads to use for scraping(default:25).', type=int,
@@ -222,7 +218,6 @@ def main():
                             version='%(prog)s ' + ProxyEater.__version__)
         scrap_arguments = parser.add_argument_group('Scrape', 'Scrape mode arguments')
         scrap_arguments.add_argument('--proxy', '-p', help=f'The proxy to use for scraping.')
-        scrap_arguments.add_argument('--proxy-type', '-type', help=f'The type of the proxies(default:all).', default='')
         scrap_arguments.add_argument('--useragent', '-ua', help=f'The useragent of the requests(default:random).')
         scrap_arguments.add_argument('--include-geolocation', '-ig',
                                      help=f'Include the geolocation info of the proxies in the output file.',
@@ -272,6 +267,20 @@ def main():
             while args.output.exists():
                 args.output = pathlib.Path('.') / f'proxies-{i}.{ext}'
                 i += 1
+
+        proxy_types = []
+        # Parse the proxy type
+        if args.proxy_type:
+            proxy_types = [x.strip() for x in args.proxy_type.split(',')]
+        if not proxy_types:
+            proxy_types = ['http', 'https', 'socks4', 'socks5']
+        try:
+            proxy_types = [ProxyType.from_name(x) for x in proxy_types]
+        except ValueError as e:
+            logger.error(e)
+            return
+        logger.info(f'Using proxy types: {[proxy_type.name for proxy_type in proxy_types]}')
+        args.proxy_types = proxy_types
 
         args.mode = args.mode.lower()
         if args.mode == 'scrape':

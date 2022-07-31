@@ -1,4 +1,4 @@
-ProxyEater\[1.5.0\]
+ProxyEater\[1.5.1\]
 ===================
 
 ![version](https://img.shields.io/pypi/v/ProxyEater)
@@ -35,9 +35,9 @@ Usage
 
 ```
 usage: ProxyEater [-h] [--source SOURCE] [--output OUTPUT] [--file-format { text, json, csv }]
-                  [--format FORMAT] [--include-status] [--threads THREADS] [--timeout TIMEOUT]
-                  [--url URL] [--verbose] [--quiet] [--version] [--proxy PROXY] [--proxy-type
-                  PROXY_TYPE] [--useragent USERAGENT] [--include-geolocation] [--no-check]
+                  [--format FORMAT] [--proxy-type PROXY_TYPE] [--include-status] [--threads
+                  THREADS] [--timeout TIMEOUT] [--url URL] [--verbose] [--quiet] [--version]
+                  [--proxy PROXY] [--useragent USERAGENT] [--include-geolocation] [--no-check]
                   [--source-format { text, json, csv }] [--default-type { http, https, socks4,
                   socks5 }]
                   mode
@@ -58,6 +58,8 @@ options:
   --format FORMAT, -f FORMAT
                         The format for saving the proxies in text
                         file(default:"{scheme}://{ip}:{port}").
+  --proxy-type PROXY_TYPE, -type PROXY_TYPE
+                        The type of the proxies(default:all).
   --include-status, -is
                         Include the status of the proxies in the output file.
   --threads THREADS, -t THREADS
@@ -78,8 +80,6 @@ Scrape:
 
   --proxy PROXY, -p PROXY
                         The proxy to use for scraping.
-  --proxy-type PROXY_TYPE, -type PROXY_TYPE
-                        The type of the proxies(default:all).
   --useragent USERAGENT, -ua USERAGENT
                         The useragent of the requests(default:random).
   --include-geolocation, -ig

@@ -7,7 +7,7 @@ with open('README.md', 'r') as f:
 
 setup(
     name='ProxyEater',
-    version='1.5.0',
+    version='1.5.1',
     author='CodeWriter21',
     author_email='CodeWriter21@gmail.com',
     description='A Python Proxy Scraper for gathering fresh proxies.',
