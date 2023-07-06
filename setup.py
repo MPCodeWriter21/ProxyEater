@@ -2,12 +2,12 @@
 
 from setuptools import setup, find_packages
 
-with open('README.md', 'r') as f:
+with open('README.md', 'r', encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
     name='ProxyEater',
-    version='1.5.1',
+    version='1.5.2',
     author='CodeWriter21',
     author_email='CodeWriter21@gmail.com',
     description='A Python Proxy Scraper for gathering fresh proxies.',
