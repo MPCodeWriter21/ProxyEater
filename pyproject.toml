@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ProxyEater"
+authors = [
+    { name = "CodeWriter21 (MehardP21)", email = "CodeWriter21@gmail.com" },
+]
+description = "A Python Proxy Scraper for gathering fresh proxies."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.8"
+keywords = ['python', 'python3', 'proxy', 'proxylist', 'ProxyEater']
+license = { text = "Apache License 2.0" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "lxml",
+    "pandas",
+    "html5lib",
+    "requests",
+    "log21>=2.5.4",
+    "beautifulsoup4",
+    "importlib_resources",
+    "random_user_agent",
+]
+version = "1.5.3"
+
+[project.urls]
+Homepage = "https://github.com/MPCodeWriter21/ProxyEater"
+Donations = "https://github.com/MPCodeWriter21/ProxyEater/blob/master/DONATE.md"
+Source = "https://github.com/MPCodeWriter21/ProxyEater"
+
+[project.optional-dependencies]
+dev = [
+    "yapf>=0.40.1",
+    "pylint>=2.17.4",
+    "docformatter>=1.7.1"
+]
+
+[project.scripts]
+ProxyEater = "ProxyEater.__main__:main"
